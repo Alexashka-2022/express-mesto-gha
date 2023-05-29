@@ -42,7 +42,7 @@ const updateUser = (req, res) => {
   userModel.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true },
+    { new: true, runValidators: true },
   ).then((user) => {
     res.status(HTTP_STATUS_OK).send(user);
   }).catch((err) => {
