@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const http2 = require('node:http2');
 
 const {
@@ -9,10 +10,10 @@ const {
 } = http2.constants;
 
 const handleError = (err, res) => {
-  if (err.name === 'CastError' || err.name === 'ValidationError') {
+  if (err instanceof mongoose.Error.CastError || err instanceof mongoose.Error.ValidationError) {
     return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
   }
-  if (err.name === 'DocumentNotFoundError') {
+  if (err instanceof mongoose.Error.DocumentNotFoundError) {
     return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Элемент с таким _id не был найден' });
   }
 
