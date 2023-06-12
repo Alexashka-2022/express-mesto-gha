@@ -1,43 +1,99 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const NotFoundError = require('../errors/NotFoundError');
+const ConflictError = require('../errors/ConflictError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
+
 const userModel = require('../models/user');
 const {
   HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
-  HTTP_STATUS_NOT_FOUND,
   handleError,
+  JWT_SECRET,
 } = require('../constants/constants');
 
-const getUsers = (req, res) => {
+/* получить список пользователей */
+const getUsers = (req, res, next) => {
   userModel.find({})
     .then((users) => {
       res.status(HTTP_STATUS_OK).send(users);
-    }).catch((err) => {
-      handleError(err, res);
-    });
+    }).catch(next);
 };
 
-const getUserById = (req, res) => {
+/* получение пользователя по Id */
+const getUserById = (req, res, next) => {
   const { userId } = req.params;
   userModel.findById(userId).orFail()
     .then((user) => {
       if (!user) {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден' });
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return res.status(HTTP_STATUS_OK).send(user);
     }).catch((err) => {
-      handleError(err, res);
+      handleError(err, next);
     });
 };
 
-const createUser = (req, res) => {
-  userModel.create(req.body)
+/* текущий пользователь */
+const getCurrentUser = (req, res, next) => {
+  userModel.findById(req.user._id)
     .then((user) => {
-      res.status(HTTP_STATUS_CREATED).send(user);
+      if (!user) {
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
+      }
+      return res.status(HTTP_STATUS_OK).send(user);
     }).catch((err) => {
-      handleError(err, res);
+      handleError(err, next);
     });
 };
 
-const updateUser = (req, res) => {
+/* регистрация пользователя */
+const createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      userModel.create({
+        name, about, avatar, email, password: hash,
+      })
+        .then((user) => {
+          res.status(HTTP_STATUS_CREATED).send({
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            email: user.email,
+          });
+        }).catch((err) => {
+          if (err.code === 11000) {
+            next(new ConflictError('Пользователь с таким email уже существует!'));
+          }
+          handleError(err, next);
+        });
+    });
+};
+
+/* авторизация пользователя */
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  userModel.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return next(new UnauthorizedError('Неверно переданный email или пароль'));
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return next(new UnauthorizedError('Неверно переданный email или пароль'));
+          }
+          const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+          return res.send({ token });
+        });
+    }).catch(next);
+};
+
+/* изменение информации о пользователе */
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
   userModel.findByIdAndUpdate(
     req.user._id,
@@ -46,27 +102,30 @@ const updateUser = (req, res) => {
   ).then((user) => {
     res.status(HTTP_STATUS_OK).send(user);
   }).catch((err) => {
-    handleError(err, res);
+    handleError(err, next);
   });
 };
 
-const updateAvatar = (req, res) => {
+/* изменение аватара пользователя */
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   userModel.findByIdAndUpdate(
     req.user._id,
     { avatar },
-    { new: true },
+    { new: true, runValidators: true },
   ).then(() => {
     res.status(HTTP_STATUS_OK).send({ avatar });
   }).catch((err) => {
-    handleError(err, res);
+    handleError(err, next);
   });
 };
 
 module.exports = {
   getUsers,
   getUserById,
+  getCurrentUser,
   createUser,
   updateUser,
   updateAvatar,
+  login,
 };

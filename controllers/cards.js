@@ -1,44 +1,49 @@
 const cardModel = require('../models/card');
+const ForbiddenError = require('../errors/ForbiddenError');
+const NotFoundError = require('../errors/NotFoundError');
 const {
   HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
-  HTTP_STATUS_NOT_FOUND,
   handleError,
 } = require('../constants/constants');
 
-const getCards = (req, res) => {
+/* получить список карточек */
+const getCards = (req, res, next) => {
   cardModel.find({})
     .then((cards) => {
       res.status(HTTP_STATUS_OK).send(cards);
-    }).catch((err) => {
-      handleError(err, res);
-    });
+    }).catch(next);
 };
 
-const createCard = (req, res) => {
+/* создание карточки */
+const createCard = (req, res, next) => {
   cardModel.create({
     owner: req.user._id,
     ...req.body,
   }).then((card) => {
     res.status(HTTP_STATUS_CREATED).send(card);
-  }).catch((err) => {
-    handleError(err, res);
-  });
+  }).catch(next);
 };
 
-const deleteCard = (req, res) => {
-  cardModel.findByIdAndRemove(req.params.cardId)
+/* удаление карточки с проверкой */
+const deleteCard = (req, res, next) => {
+  const userId = req.user._id;
+
+  cardModel.findById(req.params.cardId)
+    .orFail()
     .then((card) => {
       if (!card) {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
+        return next(new NotFoundError('Передан несуществующий _id карточки'));
       }
-      return res.status(HTTP_STATUS_OK).send(card);
-    }).catch((err) => {
-      handleError(err, res);
-    });
+      if (card.owner.toString() !== userId) {
+        return next(new ForbiddenError('У вас недостаточно прав для удаления карточки'));
+      }
+      return cardModel.deleteOne(card).then(() => res.status(HTTP_STATUS_OK).send({ message: 'Карточка успешно удалена' }));
+    }).catch((err) => handleError(err, next));
 };
 
-const likeCard = (req, res) => {
+/* лайк карточки */
+const likeCard = (req, res, next) => {
   cardModel.findByIdAndUpdate(
     req.params.cardId,
     /* $addToSet - добавляет элемент в массив, если его там ещё нет */
@@ -47,15 +52,16 @@ const likeCard = (req, res) => {
     { new: true },
   ).then((card) => {
     if (!card) {
-      return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
+      return next(new NotFoundError('Передан несуществующий _id карточки'));
     }
     return res.status(HTTP_STATUS_CREATED).send(card);
   }).catch((err) => {
-    handleError(err, res);
+    handleError(err, next);
   });
 };
 
-const dislikeCard = (req, res) => {
+/* удаление лайка карточки */
+const dislikeCard = (req, res, next) => {
   cardModel.findByIdAndUpdate(
     req.params.cardId,
     /* $pull - убирает элемент из массива */
@@ -64,11 +70,11 @@ const dislikeCard = (req, res) => {
     { new: true },
   ).then((card) => {
     if (!card) {
-      return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
+      return next(new NotFoundError('Передан несуществующий _id карточки'));
     }
     return res.status(HTTP_STATUS_OK).send(card);
   }).catch((err) => {
-    handleError(err, res);
+    handleError(err, next);
   });
 };
 
