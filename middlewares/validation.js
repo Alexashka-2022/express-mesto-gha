@@ -20,7 +20,7 @@ const registerValidation = celebrate({
     password: Joi.string().required().min(4),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(regex),
+    avatar: Joi.string().regex(regex),
   }),
 });
 
@@ -34,7 +34,7 @@ const loginValidation = celebrate({
 
 const getUserByIdValidation = celebrate({
   body: Joi.object().keys({
-    userId: Joi.string().required().length(24),
+    userId: Joi.string().length(24),
   }),
 });
 
@@ -49,7 +49,7 @@ const updateUserValidation = celebrate({
 /* валидация при изменении аватара */
 const updateAvatarValidation = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(regex),
+    avatar: Joi.string().regex(regex),
   }),
 });
 
@@ -57,21 +57,21 @@ const updateAvatarValidation = celebrate({
 const createCardValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(regex),
+    link: Joi.string().required().regex(regex),
   }),
 });
 
 /* валидация id при удалении карточки */
 const deleteCardValidation = celebrate({
   body: Joi.object().keys({
-    cardId: Joi.string().required().length(24),
+    cardId: Joi.string().length(24),
   }),
 });
 
 /* валидация id при лайке карточки */
 const likeCardValidation = celebrate({
   body: Joi.object().keys({
-    cardId: Joi.string().required().length(24),
+    cardId: Joi.string().length(24),
   }),
 });
 
