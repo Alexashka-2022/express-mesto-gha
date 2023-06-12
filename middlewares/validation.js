@@ -34,15 +34,15 @@ const loginValidation = celebrate({
 
 const getUserByIdValidation = celebrate({
   body: Joi.object().keys({
-    userId: Joi.string().length(24),
+    userId: Joi.string().required().length(24),
   }),
 });
 
 /* валидация информации при изменении пользователя */
 const updateUserValidation = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
   }),
 });
 
@@ -56,7 +56,7 @@ const updateAvatarValidation = celebrate({
 /* валидация создания карточки */
 const createCardValidation = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
     link: Joi.string().required().pattern(regex),
   }),
 });
@@ -64,14 +64,14 @@ const createCardValidation = celebrate({
 /* валидация id при удалении карточки */
 const deleteCardValidation = celebrate({
   body: Joi.object().keys({
-    cardId: Joi.string().length(24),
+    cardId: Joi.string().required().length(24),
   }),
 });
 
 /* валидация id при лайке карточки */
 const likeCardValidation = celebrate({
   body: Joi.object().keys({
-    cardId: Joi.string().length(24),
+    cardId: Joi.string().required().length(24),
   }),
 });
 
