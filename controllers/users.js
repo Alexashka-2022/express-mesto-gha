@@ -22,13 +22,13 @@ const getUsers = (req, res, next) => {
 
 /* получение пользователя по Id */
 const getUserById = (req, res, next) => {
-  const { userId } = req.params;
-  userModel.findById(userId).orFail()
+  userModel.findById(req.params.userId).orFail()
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь по указанному _id не найден'));
+        throw new NotFoundError('Пользователь по указанному _id не найден');
+      } else {
+        res.status(HTTP_STATUS_OK).send(user);
       }
-      return res.status(HTTP_STATUS_OK).send(user);
     }).catch((err) => {
       handleError(err, next);
     });
@@ -39,9 +39,10 @@ const getCurrentUser = (req, res, next) => {
   userModel.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь по указанному _id не найден'));
+        next(new NotFoundError('Пользователь по указанному _id не найден'));
+      } else {
+        res.status(HTTP_STATUS_OK).send(user);
       }
-      return res.status(HTTP_STATUS_OK).send(user);
     }).catch((err) => {
       handleError(err, next);
     });

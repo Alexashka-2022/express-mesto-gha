@@ -20,7 +20,7 @@ const registerValidation = celebrate({
     password: Joi.string().required().min(4),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(regex),
+    avatar: Joi.string().pattern(regex),
   }),
 });
 
@@ -33,8 +33,8 @@ const loginValidation = celebrate({
 });
 
 const getUserByIdValidation = celebrate({
-  body: Joi.object().keys({
-    userId: Joi.string().length(24),
+  params: Joi.object().keys({
+    userId: Joi.string().hex().length(24).required(),
   }),
 });
 
@@ -49,7 +49,7 @@ const updateUserValidation = celebrate({
 /* валидация при изменении аватара */
 const updateAvatarValidation = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().regex(regex),
+    avatar: Joi.string().pattern(regex),
   }),
 });
 
@@ -57,21 +57,14 @@ const updateAvatarValidation = celebrate({
 const createCardValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().regex(regex),
+    link: Joi.string().required().pattern(regex),
   }),
 });
 
-/* валидация id при удалении карточки */
-const deleteCardValidation = celebrate({
-  body: Joi.object().keys({
-    cardId: Joi.string().length(24),
-  }),
-});
-
-/* валидация id при лайке карточки */
-const likeCardValidation = celebrate({
-  body: Joi.object().keys({
-    cardId: Joi.string().length(24),
+/* валидация id карточки */
+const checkCardIdValidation = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().hex().length(24).required(),
   }),
 });
 
@@ -82,6 +75,5 @@ module.exports = {
   updateUserValidation,
   updateAvatarValidation,
   createCardValidation,
-  deleteCardValidation,
-  likeCardValidation,
+  checkCardIdValidation,
 };

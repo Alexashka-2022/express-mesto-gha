@@ -4,8 +4,8 @@ const cardValidation = require('../middlewares/validation');
 
 cardsRouter.get('/', cardsControllers.getCards);
 cardsRouter.post('/', cardValidation.createCardValidation, cardsControllers.createCard);
-cardsRouter.delete('/:cardId', cardValidation.deleteCardValidation, cardsControllers.deleteCard);
-cardsRouter.put('/:cardId/likes', cardValidation.likeCardValidation, cardsControllers.likeCard);
-cardsRouter.delete('/:cardId/likes', cardValidation.likeCardValidation, cardsControllers.dislikeCard);
+cardsRouter.delete('/:cardId', cardValidation.checkCardIdValidation, cardsControllers.deleteCard);
+cardsRouter.put('/:cardId/likes', cardValidation.checkCardIdValidation, cardsControllers.likeCard);
+cardsRouter.delete('/:cardId/likes', cardValidation.checkCardIdValidation, cardsControllers.dislikeCard);
 
 module.exports = cardsRouter;
