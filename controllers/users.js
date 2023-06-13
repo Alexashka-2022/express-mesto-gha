@@ -25,7 +25,7 @@ const getUserById = (req, res, next) => {
   userModel.findById(req.params.userId).orFail()
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден');
+        next(new NotFoundError('Пользователь по указанному _id не найден'));
       } else {
         res.status(HTTP_STATUS_OK).send(user);
       }
