@@ -4,6 +4,7 @@ const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 
 const JWT_SECRET = 'secret-key';
+const regexLink = /^(http|https):\/\/(www\.)?(?:[a-z0-9]+[a-z0-9-]*\.)+[a-z]{2,}?(?:\/\S*)?#?$/;
 
 const {
   HTTP_STATUS_OK,
@@ -29,4 +30,5 @@ module.exports = {
   HTTP_STATUS_NOT_FOUND,
   handleError,
   JWT_SECRET,
+  regexLink,
 };

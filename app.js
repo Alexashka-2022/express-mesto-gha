@@ -7,6 +7,8 @@ const router = require('./routes/router');
 const auth = require('./middlewares/auth');
 const { registerValidation, loginValidation } = require('./middlewares/validation');
 
+const { serverError } = require('./middlewares/serverError');
+
 const { PORT = 3000 } = process.env;
 mongoose.connect('mongodb://0.0.0.0:27017/mestodb')
   .then(() => {
@@ -28,12 +30,7 @@ app.post('/signup', registerValidation, createUser);
 app.use(auth);
 app.use(router);
 app.use(errors());
-
-app.use((err, req, res, next) => {
-  const { status = 500, message } = err;
-  res.status(status).send({ message: status === 500 ? 'Сервер передал ошибку' : message });
-  next();
-});
+app.use(serverError);
 
 app.listen(PORT, () => {
   console.log(`Приложение слушает порт ${PORT}`);

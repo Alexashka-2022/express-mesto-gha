@@ -71,7 +71,7 @@ const createUser = (req, res, next) => {
           }
           handleError(err, next);
         });
-    });
+    }).catch(next);
 };
 
 /* авторизация пользователя */

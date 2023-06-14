@@ -2,7 +2,7 @@ const { celebrate, Joi } = require('celebrate');
 const isEmail = require('validator/lib/isEmail');
 const BadRequestError = require('../errors/BadRequestError');
 
-const regex = /^(http|https):\/\/[^"]+$/;
+const { regexLink } = require('../constants/constants');
 
 /* валидация электронной почты с помощью validator */
 const validateEmail = (email) => {
@@ -20,7 +20,7 @@ const registerValidation = celebrate({
     password: Joi.string().required().min(4),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(regex),
+    avatar: Joi.string().pattern(regexLink),
   }),
 });
 
@@ -49,7 +49,7 @@ const updateUserValidation = celebrate({
 /* валидация при изменении аватара */
 const updateAvatarValidation = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(regex),
+    avatar: Joi.string().pattern(regexLink),
   }),
 });
 
@@ -57,7 +57,7 @@ const updateAvatarValidation = celebrate({
 const createCardValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(regex),
+    link: Joi.string().required().pattern(regexLink),
   }),
 });
 
