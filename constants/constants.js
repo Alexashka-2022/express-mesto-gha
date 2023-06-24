@@ -12,6 +12,10 @@ const {
   HTTP_STATUS_NOT_FOUND,
 } = http2.constants;
 
+const allowedCors = ['localhost:3000'];
+
+const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+
 const handleError = (err, next) => {
   if (err instanceof mongoose.Error.CastError || err instanceof mongoose.Error.ValidationError) {
     return next(new BadRequestError('Переданы некорректные данные'));
@@ -31,4 +35,6 @@ module.exports = {
   handleError,
   JWT_SECRET,
   regexLink,
+  allowedCors,
+  DEFAULT_ALLOWED_METHODS,
 };
