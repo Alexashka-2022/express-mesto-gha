@@ -12,7 +12,11 @@ const {
   HTTP_STATUS_NOT_FOUND,
 } = http2.constants;
 
-const allowedCors = ['localhost:3000'];
+const allowedCors = ['http://avibus-bonis.nomoreparties.sbs',
+  'https://avibus-bonis.nomoreparties.sbs',
+  'http://api.nomoreparties.sbs',
+  'https://api.nomoreparties.sbs',
+  'localhost:3000'];
 
 const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
 
