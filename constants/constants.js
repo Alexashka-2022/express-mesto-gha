@@ -12,10 +12,10 @@ const {
   HTTP_STATUS_NOT_FOUND,
 } = http2.constants;
 
-const allowedCors = ['http://avibus-bonis.nomoreparties.sbs',
-  'https://avibus-bonis.nomoreparties.sbs',
-  'http://api.nomoreparties.sbs',
-  'https://api.nomoreparties.sbs',
+const allowedCors = ['http://shmakov.students.nomoreparties.sbs',
+  'https://shmakov.students.nomoreparties.sbs',
+  'http://api.shmakov.students.nomoreparties.sbs',
+  'https://api.shmakov.students.nomoreparties.sbs',
   'localhost:3000'];
 
 const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
