@@ -18,3 +18,5 @@
 ## Ссылка на репозиторий проекта
 
 https://github.com/Alexashka-2022/express-mesto-gha.git
+
+**Статус проекта:** проект завершен
